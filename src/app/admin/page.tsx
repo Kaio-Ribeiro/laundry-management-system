@@ -1,11 +1,30 @@
 'use client';
 
-import { Users, Package, BarChart3, Droplets } from 'lucide-react';
+import { Users, Package, BarChart3, Droplets, Users2 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export default function AdminPage() {
+  const router = useRouter();
+  
   const handleSignOut = () => {
     signOut({ callbackUrl: '/' });
+  };
+
+  const navigateToUsers = () => {
+    router.push('/admin/users');
+  };
+
+  const navigateToServices = () => {
+    router.push('/admin/services');
+  };
+
+  const navigateToCustomers = () => {
+    router.push('/admin/customers');
+  };
+
+  const navigateToReports = () => {
+    router.push('/admin/reports');
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50">
@@ -64,8 +83,11 @@ export default function AdminPage() {
             </div>
           </div>
           
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="bg-white overflow-hidden shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div 
+              onClick={navigateToUsers}
+              className="bg-white overflow-hidden shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow cursor-pointer"
+            >
               <div className="p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
@@ -76,27 +98,30 @@ export default function AdminPage() {
                   <div className="ml-5 w-0 flex-1">
                     <dl>
                       <dt className="text-sm font-medium text-gray-500 truncate">
-                        Gerenciar Usuários
+                        Gerenciar Vendedores
                       </dt>
                       <dd className="text-lg font-semibold text-gray-900">
-                        Vendedores e Funcionários
+                        Vendedores
                       </dd>
                     </dl>
                   </div>
                 </div>
                 <div className="mt-4">
-                  <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                    Ver Todos os Usuários →
-                  </button>
+                  <span className="text-blue-600 text-sm font-medium">
+                    Ver Todos os Vendedores →
+                  </span>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white overflow-hidden shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow">
+            <div 
+              onClick={navigateToServices}
+              className="bg-white overflow-hidden shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow cursor-pointer"
+            >
               <div className="p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <div className="h-12 w-12 bg-cyan-500 rounded-lg flex items-center justify-center">
+                    <div className="h-12 w-12 bg-green-500 rounded-lg flex items-center justify-center">
                       <Package className="h-6 w-6 text-white" />
                     </div>
                   </div>
@@ -112,14 +137,47 @@ export default function AdminPage() {
                   </div>
                 </div>
                 <div className="mt-4">
-                  <button className="text-cyan-600 hover:text-cyan-700 text-sm font-medium">
+                  <span className="text-green-600 text-sm font-medium">
                     Gerenciar Serviços →
-                  </button>
+                  </span>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white overflow-hidden shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow">
+            <div 
+              onClick={navigateToCustomers}
+              className="bg-white overflow-hidden shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow cursor-pointer"
+            >
+              <div className="p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="h-12 w-12 bg-cyan-500 rounded-lg flex items-center justify-center">
+                      <Users2 className="h-6 w-6 text-white" />
+                    </div>
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">
+                        Gerenciar Clientes
+                      </dt>
+                      <dd className="text-lg font-semibold text-gray-900">
+                        Clientes
+                      </dd>
+                    </dl>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <span className="text-cyan-600 text-sm font-medium">
+                    Ver Todos os Clientes →
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div 
+              onClick={navigateToReports}
+              className="bg-white overflow-hidden shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow cursor-pointer"
+            >
               <div className="p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
@@ -133,15 +191,15 @@ export default function AdminPage() {
                         Relatórios e Análises
                       </dt>
                       <dd className="text-lg font-semibold text-gray-900">
-                        Visão Geral de Vendas
+                        Vendas e Desempenho
                       </dd>
                     </dl>
                   </div>
                 </div>
                 <div className="mt-4">
-                  <button className="text-purple-600 hover:text-purple-700 text-sm font-medium">
+                  <span className="text-purple-600 text-sm font-medium">
                     Ver Relatórios →
-                  </button>
+                  </span>
                 </div>
               </div>
             </div>
