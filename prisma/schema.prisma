@@ -47,6 +47,7 @@ model Service {
   name        String
   description String?
   price       Float
+  commission  Float   @default(0) // Comissão do vendedor
   isActive    Boolean @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
