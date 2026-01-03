@@ -170,10 +170,6 @@ export default function CustomersPage() {
     setSuccess('');
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR');
-  };
-
   const formatPhone = (phone: string) => {
     // Simples formatação para telefone brasileiro
     const cleaned = phone.replace(/\D/g, '');

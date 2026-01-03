@@ -36,7 +36,7 @@ export default function LoginPage() {
         // Redirect based on role will be handled by middleware
         router.push('/dashboard');
       }
-    } catch (error) {
+    } catch {
       setError('Ocorreu um erro. Tente novamente.');
     } finally {
       setIsLoading(false);

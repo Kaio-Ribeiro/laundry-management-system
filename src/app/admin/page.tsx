@@ -191,7 +191,7 @@ export default function AdminPage() {
                         Relatórios e Análises
                       </dt>
                       <dd className="text-lg font-semibold text-gray-900">
-                        Vendas e Desempenho
+                        Relatórios
                       </dd>
                     </dl>
                   </div>
