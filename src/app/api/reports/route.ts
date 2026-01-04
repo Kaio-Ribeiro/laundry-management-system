@@ -21,8 +21,16 @@ export async function GET(request: NextRequest) {
     
     if (startDate && endDate) {
       where.createdAt = {
-        gte: new Date(startDate),
-        lte: new Date(endDate)
+        gte: new Date(`${startDate}T00:00:00.000Z`),
+        lte: new Date(`${endDate}T23:59:59.999Z`)
+      };
+    } else if (startDate) {
+      where.createdAt = {
+        gte: new Date(`${startDate}T00:00:00.000Z`)
+      };
+    } else if (endDate) {
+      where.createdAt = {
+        lte: new Date(`${endDate}T23:59:59.999Z`)
       };
     }
 
@@ -58,8 +66,16 @@ export async function GET(request: NextRequest) {
       by: ['status'],
       where: startDate && endDate ? {
         createdAt: {
-          gte: new Date(startDate),
-          lte: new Date(endDate)
+          gte: new Date(`${startDate}T00:00:00.000Z`),
+          lte: new Date(`${endDate}T23:59:59.999Z`)
+        }
+      } : startDate ? {
+        createdAt: {
+          gte: new Date(`${startDate}T00:00:00.000Z`)
+        }
+      } : endDate ? {
+        createdAt: {
+          lte: new Date(`${endDate}T23:59:59.999Z`)
         }
       } : undefined,
       _count: {
@@ -73,8 +89,16 @@ export async function GET(request: NextRequest) {
       where: {
         order: startDate && endDate ? {
           createdAt: {
-            gte: new Date(startDate),
-            lte: new Date(endDate)
+            gte: new Date(`${startDate}T00:00:00.000Z`),
+            lte: new Date(`${endDate}T23:59:59.999Z`)
+          }
+        } : startDate ? {
+          createdAt: {
+            gte: new Date(`${startDate}T00:00:00.000Z`)
+          }
+        } : endDate ? {
+          createdAt: {
+            lte: new Date(`${endDate}T23:59:59.999Z`)
           }
         } : undefined
       },
@@ -118,7 +142,7 @@ export async function GET(request: NextRequest) {
         ) as revenue
       FROM orders o
       WHERE 
-        ${startDate && endDate ? `createdAt >= '${startDate}' AND createdAt <= '${endDate}'` : `createdAt >= datetime('now', '-6 months')`}
+        ${startDate && endDate ? `createdAt >= '${startDate} 00:00:00' AND createdAt <= '${endDate} 23:59:59'` : startDate ? `createdAt >= '${startDate} 00:00:00'` : endDate ? `createdAt <= '${endDate} 23:59:59'` : `createdAt >= datetime('now', '-6 months')`}
       GROUP BY strftime('%Y-%m', createdAt)
       ORDER BY month DESC
       LIMIT 12

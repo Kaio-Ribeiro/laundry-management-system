@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { BarChart3, Calendar, Droplets, DollarSign, ShoppingBag, TrendingUp } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
@@ -77,7 +77,7 @@ export default function ReportsPage() {
     signOut({ callbackUrl: '/' });
   };
 
-  const fetchReportData = useCallback(async () => {
+  const fetchReportData = async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
@@ -100,7 +100,7 @@ export default function ReportsPage() {
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  };
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -129,8 +129,28 @@ export default function ReportsPage() {
   };
 
   useEffect(() => {
-    fetchReportData();
-  }, [fetchReportData]);
+    // Carregar dados iniciais sem filtros
+    const loadInitialData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/reports');
+        
+        if (response.ok) {
+          const data = await response.json();
+          setReportData(data);
+          setError('');
+        } else {
+          setError('Erro ao carregar relatório');
+        }
+      } catch {
+        setError('Erro ao carregar relatório');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadInitialData();
+  }, []); // Array vazio para executar apenas uma vez
 
   if (loading) {
     return (

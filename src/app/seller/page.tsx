@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Users, ShoppingCart, Droplets, Plus, ArrowRight } from 'lucide-react';
+import { Users, ShoppingCart, Droplets, Plus } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import ManagementCard from '@/components/ManagementCard';
 
 interface Customer {
   id: string;
@@ -253,67 +254,25 @@ export default function SellerPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2 mb-8">
-            <div 
+            <ManagementCard
+              icon={Users}
+              iconColor="bg-blue-500"
+              title="Gerenciar Clientes"
+              subtitle="Clientes"
+              actionText="Ver Todos os Clientes"
+              actionColor="text-blue-600"
               onClick={() => router.push('/seller/customers')}
-              className="bg-white overflow-hidden shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow cursor-pointer"
-            >
-              <div className="p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="h-12 w-12 bg-blue-500 rounded-lg flex items-center justify-center">
-                      <Users className="h-6 w-6 text-white" />
-                    </div>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        Gerenciar Clientes
-                      </dt>
-                      <dd className="text-lg font-semibold text-gray-900">
-                        Clientes
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-                <div className="mt-4 flex items-center justify-between">
-                  <span className="text-blue-600 text-sm font-medium">
-                    Ver Todos os Clientes
-                  </span>
-                  <ArrowRight className="w-4 h-4 text-blue-600" />
-                </div>
-              </div>
-            </div>
+            />
 
-            <div 
+            <ManagementCard
+              icon={ShoppingCart}
+              iconColor="bg-green-500"
+              title="Gestão de Pedidos"
+              subtitle="Criar e Acompanhar Pedidos"
+              actionText="Gerenciar Pedidos"
+              actionColor="text-green-600"
               onClick={() => router.push('/seller/orders')}
-              className="bg-white overflow-hidden shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow cursor-pointer"
-            >
-              <div className="p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="h-12 w-12 bg-green-500 rounded-lg flex items-center justify-center">
-                      <ShoppingCart className="h-6 w-6 text-white" />
-                    </div>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        Gestão de Pedidos
-                      </dt>
-                      <dd className="text-lg font-semibold text-gray-900">
-                        Criar e Acompanhar Pedidos
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-                <div className="mt-4 flex items-center justify-between">
-                  <span className="text-green-600 text-sm font-medium">
-                    Gerenciar Pedidos
-                  </span>
-                  <ArrowRight className="w-4 h-4 text-green-600" />
-                </div>
-              </div>
-            </div>
+            />
           </div>
         </div>
       </div>

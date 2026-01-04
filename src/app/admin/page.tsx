@@ -3,6 +3,7 @@
 import { Users, Package, BarChart3, Droplets, Users2 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import ManagementCard from '@/components/ManagementCard';
 
 export default function AdminPage() {
   const router = useRouter();
@@ -84,125 +85,45 @@ export default function AdminPage() {
           </div>
           
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <div 
+            <ManagementCard
+              icon={Users}
+              iconColor="bg-blue-500"
+              title="Gerenciar Vendedores"
+              subtitle="Vendedores"
+              actionText="Ver Todos os Vendedores"
+              actionColor="text-blue-600"
               onClick={navigateToUsers}
-              className="bg-white overflow-hidden shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow cursor-pointer"
-            >
-              <div className="p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="h-12 w-12 bg-blue-500 rounded-lg flex items-center justify-center">
-                      <Users className="h-6 w-6 text-white" />
-                    </div>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        Gerenciar Vendedores
-                      </dt>
-                      <dd className="text-lg font-semibold text-gray-900">
-                        Vendedores
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <span className="text-blue-600 text-sm font-medium">
-                    Ver Todos os Vendedores →
-                  </span>
-                </div>
-              </div>
-            </div>
+            />
 
-            <div 
+            <ManagementCard
+              icon={Package}
+              iconColor="bg-green-500"
+              title="Serviços e Produtos"
+              subtitle="Serviços"
+              actionText="Gerenciar Serviços"
+              actionColor="text-green-600"
               onClick={navigateToServices}
-              className="bg-white overflow-hidden shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow cursor-pointer"
-            >
-              <div className="p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="h-12 w-12 bg-green-500 rounded-lg flex items-center justify-center">
-                      <Package className="h-6 w-6 text-white" />
-                    </div>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        Serviços e Produtos
-                      </dt>
-                      <dd className="text-lg font-semibold text-gray-900">
-                        Gerenciar Preços
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <span className="text-green-600 text-sm font-medium">
-                    Gerenciar Serviços →
-                  </span>
-                </div>
-              </div>
-            </div>
+            />
 
-            <div 
+            <ManagementCard
+              icon={Users2}
+              iconColor="bg-cyan-500"
+              title="Gerenciar Clientes"
+              subtitle="Clientes"
+              actionText="Ver Todos os Clientes"
+              actionColor="text-cyan-600"
               onClick={navigateToCustomers}
-              className="bg-white overflow-hidden shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow cursor-pointer"
-            >
-              <div className="p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="h-12 w-12 bg-cyan-500 rounded-lg flex items-center justify-center">
-                      <Users2 className="h-6 w-6 text-white" />
-                    </div>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        Gerenciar Clientes
-                      </dt>
-                      <dd className="text-lg font-semibold text-gray-900">
-                        Clientes
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <span className="text-cyan-600 text-sm font-medium">
-                    Ver Todos os Clientes →
-                  </span>
-                </div>
-              </div>
-            </div>
+            />
 
-            <div 
+            <ManagementCard
+              icon={BarChart3}
+              iconColor="bg-purple-500"
+              title="Relatórios e Análises"
+              subtitle="Relatórios"
+              actionText="Ver Relatórios"
+              actionColor="text-purple-600"
               onClick={navigateToReports}
-              className="bg-white overflow-hidden shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow cursor-pointer"
-            >
-              <div className="p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="h-12 w-12 bg-purple-500 rounded-lg flex items-center justify-center">
-                      <BarChart3 className="h-6 w-6 text-white" />
-                    </div>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        Relatórios e Análises
-                      </dt>
-                      <dd className="text-lg font-semibold text-gray-900">
-                        Relatórios
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <span className="text-purple-600 text-sm font-medium">
-                    Ver Relatórios →
-                  </span>
-                </div>
-              </div>
-            </div>
+            />
           </div>
         </div>
       </div>
