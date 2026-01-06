@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -15,7 +15,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    const orderId = params.id;
+    const { id: orderId } = await params;
     const body = await request.json();
     const { customerId, serviceId, quantity, notes, status } = body;
 
@@ -109,7 +109,7 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -117,7 +117,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    const orderId = params.id;
+    const { id: orderId } = await params;
 
     // Verificar se o pedido existe
     const existingOrder = await prisma.order.findUnique({
