@@ -27,6 +27,7 @@ export default function ServicesPage() {
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   
   const [formData, setFormData] = useState({
     name: '',
@@ -185,6 +186,11 @@ export default function ServicesPage() {
     }).format(price);
   };
 
+  // Filtrar serviços baseado no termo de busca
+  const filteredServices = services.filter(service =>
+    service.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   useEffect(() => {
     fetchServices();
   }, []);
@@ -259,6 +265,16 @@ export default function ServicesPage() {
             <Plus className="w-4 h-4 mr-2" />
             Novo Serviço
           </Button>
+        </div>
+
+        {/* Campo de Busca */}
+        <div className="mb-6">
+          <Input
+            placeholder="Buscar serviço..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500 max-w-sm"
+          />
         </div>
 
         {/* Modal de Formulário */}
@@ -352,7 +368,12 @@ export default function ServicesPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-gray-900">
               <Package className="w-5 h-5" />
-              Serviços Cadastrados ({services.length})
+              Serviços Cadastrados ({filteredServices.length})
+              {searchTerm && (
+                <span className="text-sm font-normal text-gray-500">
+                  de {services.length} total
+                </span>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -368,7 +389,7 @@ export default function ServicesPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {services.map((service) => (
+                  {filteredServices.map((service) => (
                     <tr key={service.id} className="border-b hover:bg-gray-50">
                       <td className="py-3 text-gray-900">{service.name}</td>
                       <td className="py-3 text-gray-900">
@@ -407,10 +428,17 @@ export default function ServicesPage() {
                       </td>
                     </tr>
                   ))}
+                  {filteredServices.length === 0 && services.length > 0 && (
+                    <tr>
+                      <td colSpan={5} className="py-8 text-center text-gray-500">
+                        Nenhum serviço encontrado para &apos;{searchTerm}&apos;
+                      </td>
+                    </tr>
+                  )}
                   {services.length === 0 && (
                     <tr>
                       <td colSpan={5} className="py-8 text-center text-gray-500">
-                        Nenhum serviço encontrado
+                        Nenhum serviço cadastrado
                       </td>
                     </tr>
                   )}

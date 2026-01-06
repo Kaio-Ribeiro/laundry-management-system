@@ -27,6 +27,7 @@ export default function UsersPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   
   const [formData, setFormData] = useState({
     name: '',
@@ -166,6 +167,11 @@ export default function UsersPage() {
     setSuccess('');
   };
 
+  // Filtrar vendedores baseado no termo de busca
+  const filteredUsers = users.filter(user =>
+    user.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -240,6 +246,16 @@ export default function UsersPage() {
             <Plus className="w-4 h-4 mr-2" />
             Novo Vendedor
           </Button>
+        </div>
+
+        {/* Campo de Busca */}
+        <div className="mb-6">
+          <Input
+            placeholder="Buscar vendedor..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500 max-w-sm"
+          />
         </div>
 
         {/* Modal de Formulário */}
@@ -331,7 +347,12 @@ export default function UsersPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-gray-900">
               <Users className="w-5 h-5" />
-              Vendedores Cadastrados ({users.length})
+              Vendedores Cadastrados ({filteredUsers.length})
+              {searchTerm && (
+                <span className="text-sm font-normal text-gray-500">
+                  de {users.length} total
+                </span>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -346,7 +367,7 @@ export default function UsersPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((user) => (
+                  {filteredUsers.map((user) => (
                     <tr key={user.id} className="border-b hover:bg-gray-50">
                       <td className="py-3 text-gray-900">{user.name}</td>
                       <td className="py-3 text-gray-900">{user.email}</td>
@@ -380,10 +401,17 @@ export default function UsersPage() {
                       </td>
                     </tr>
                   ))}
+                  {filteredUsers.length === 0 && users.length > 0 && (
+                    <tr>
+                      <td colSpan={4} className="py-8 text-center text-gray-500">
+                        Nenhum vendedor encontrado para &apos;{searchTerm}&apos;
+                      </td>
+                    </tr>
+                  )}
                   {users.length === 0 && (
                     <tr>
                       <td colSpan={4} className="py-8 text-center text-gray-500">
-                        Nenhum vendedor encontrado
+                        Nenhum vendedor cadastrado
                       </td>
                     </tr>
                   )}

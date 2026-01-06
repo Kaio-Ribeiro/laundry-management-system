@@ -112,13 +112,6 @@ export default function LoginPage() {
               Entrar
             </Button>
           </form>
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-            <p className="text-sm text-center text-gray-600 font-medium">Credenciais Padrão</p>
-            <p className="text-sm text-center text-gray-500 mt-1">
-              <span className="font-medium">E-mail:</span> admin@laundry.com<br/>
-              <span className="font-medium">Senha:</span> admin123
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>

@@ -36,6 +36,7 @@ export default function SellerCustomersPage() {
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   
   const [formData, setFormData] = useState({
     name: '',
@@ -181,6 +182,11 @@ export default function SellerCustomersPage() {
     return phone;
   };
 
+  // Filtrar clientes baseado no termo de busca
+  const filteredCustomers = customers.filter(customer =>
+    customer.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   useEffect(() => {
     fetchCustomers();
   }, []);
@@ -256,6 +262,16 @@ export default function SellerCustomersPage() {
             <Plus className="w-4 h-4 mr-2" />
             Novo Cliente
           </Button>
+        </div>
+
+        {/* Campo de Busca */}
+        <div className="mb-6">
+          <Input
+            placeholder="Buscar cliente..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500 max-w-sm"
+          />
         </div>
 
         {/* Modal de Formulário */}
@@ -342,7 +358,12 @@ export default function SellerCustomersPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-gray-900">
               <Users2 className="w-5 h-5" />
-              Clientes Cadastrados ({customers.length})
+              Clientes Cadastrados ({filteredCustomers.length})
+              {searchTerm && (
+                <span className="text-sm font-normal text-gray-500">
+                  de {customers.length} total
+                </span>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -358,7 +379,7 @@ export default function SellerCustomersPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {customers.map((customer) => (
+                  {filteredCustomers.map((customer) => (
                     <tr key={customer.id} className="border-b hover:bg-gray-50">
                       <td className="py-3 text-gray-900 font-medium">{customer.name}</td>
                       <td className="py-3 text-gray-900">{formatPhone(customer.phone)}</td>
@@ -393,10 +414,17 @@ export default function SellerCustomersPage() {
                       </td>
                     </tr>
                   ))}
+                  {filteredCustomers.length === 0 && customers.length > 0 && (
+                    <tr>
+                      <td colSpan={5} className="py-8 text-center text-gray-500">
+                        Nenhum cliente encontrado para &apos;{searchTerm}&apos;
+                      </td>
+                    </tr>
+                  )}
                   {customers.length === 0 && (
                     <tr>
                       <td colSpan={5} className="py-8 text-center text-gray-500">
-                        Nenhum cliente encontrado
+                        Nenhum cliente cadastrado
                       </td>
                     </tr>
                   )}
