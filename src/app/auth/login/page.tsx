@@ -33,8 +33,17 @@ export default function LoginPage() {
       if (result?.error) {
         setError('Credenciais inválidas. Tente novamente.');
       } else {
-        // Redirect based on role will be handled by middleware
-        router.push('/dashboard');
+        // Get session to check user role and redirect accordingly
+        const response = await fetch('/api/auth/session');
+        const session = await response.json();
+        
+        if (session?.user?.role === 'ADMIN') {
+          router.push('/admin');
+        } else if (session?.user?.role === 'SELLER') {
+          router.push('/seller');
+        } else {
+          router.push('/dashboard');
+        }
       }
     } catch {
       setError('Ocorreu um erro. Tente novamente.');
