@@ -1,40 +1,47 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Droplets, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Droplets } from 'lucide-react';
 
-export default function LoginPage() {
+export default function CreateAdminPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
+    setMessage('');
 
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
+      const response = await fetch('/api/auth/create-admin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, name }),
       });
 
-      if (result?.error) {
-        setError('Credenciais inválidas. Tente novamente.');
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage('Usuário admin criado com sucesso!');
+        setTimeout(() => {
+          router.push('/auth/login');
+        }, 2000);
       } else {
-        // Redirect based on role will be handled by middleware
-        router.push('/dashboard');
+        setError(data.error || 'Erro ao criar usuário');
       }
     } catch {
       setError('Ocorreu um erro. Tente novamente.');
@@ -52,15 +59,27 @@ export default function LoginPage() {
               <Droplets className="w-6 h-6 text-white" />
             </div>
             <CardTitle className="text-2xl text-gray-800">
-              Clean<span className="text-blue-500">Wash</span>
+              Criar Admin
             </CardTitle>
           </div>
           <CardDescription className="text-gray-600">
-            Acesse seu painel de gerenciamento
+            Página temporária para criar usuário administrador
           </CardDescription>
         </CardHeader>
         <CardContent className="pb-8">
           <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-gray-700 font-medium">Nome</Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Nome completo"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-11 placeholder:text-gray-400"
+                required
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="email" className="text-gray-700 font-medium">E-mail</Label>
               <Input
@@ -75,32 +94,24 @@ export default function LoginPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password" className="text-gray-700 font-medium">Senha</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Digite sua senha"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-11 placeholder:text-gray-400 pr-10"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
-                </button>
-              </div>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Digite uma senha"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-11 placeholder:text-gray-400"
+                required
+              />
             </div>
             {error && (
               <Alert variant="destructive" className="bg-red-50 border-red-200 text-red-700">
                 <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            {message && (
+              <Alert className="bg-green-50 border-green-200 text-green-700">
+                <AlertDescription>{message}</AlertDescription>
               </Alert>
             )}
             <Button 
@@ -109,15 +120,15 @@ export default function LoginPage() {
               disabled={isLoading}
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Entrar
+              Criar Usuário Admin
             </Button>
           </form>
           <div className="mt-6 text-center">
             <a 
-              href="/auth/create-admin" 
+              href="/auth/login" 
               className="text-sm text-gray-500 hover:text-blue-500 underline"
             >
-              Criar usuário admin (temporário)
+              Voltar para login
             </a>
           </div>
         </CardContent>
