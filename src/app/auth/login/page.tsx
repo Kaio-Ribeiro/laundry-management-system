@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { signIn, useSession } from 'next-auth/react';
+import { useState } from 'react';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,20 +17,6 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const { data: session, status } = useSession();
-
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (status === 'authenticated' && session?.user?.role) {
-      if (session.user.role === 'ADMIN') {
-        router.push('/admin');
-      } else if (session.user.role === 'SELLER') {
-        router.push('/seller');
-      } else {
-        router.push('/dashboard');
-      }
-    }
-  }, [session, status, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,9 +33,17 @@ export default function LoginPage() {
       if (result?.error) {
         setError('Credenciais inválidas. Tente novamente.');
       } else {
-        // O useEffect vai cuidar do redirecionamento quando a sessão for atualizada
-        // Força refresh da sessão
-        window.location.reload();
+        // Get session to check user role and redirect accordingly
+        const response = await fetch('/api/auth/session');
+        const session = await response.json();
+        
+        if (session?.user?.role === 'ADMIN') {
+          router.push('/admin');
+        } else if (session?.user?.role === 'SELLER') {
+          router.push('/seller');
+        } else {
+          router.push('/dashboard');
+        }
       }
     } catch {
       setError('Ocorreu um erro. Tente novamente.');
