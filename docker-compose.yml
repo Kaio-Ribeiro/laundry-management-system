@@ -5,9 +5,12 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=file:./dev.db
+      - DATABASE_URL=file:/app/prisma/dev.db
       - NEXTAUTH_SECRET=your-production-secret-key
       - NEXTAUTH_URL=http://localhost:3000
     volumes:
-      - ./prisma/dev.db:/app/prisma/dev.db
+      - laundry_db:/app/prisma
     restart: unless-stopped
+
+volumes:
+  laundry_db:

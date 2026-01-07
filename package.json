@@ -39,6 +39,9 @@
     "tsx": "^4.21.0",
     "zod": "^4.3.4"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",

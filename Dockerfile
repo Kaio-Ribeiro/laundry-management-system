@@ -33,6 +33,16 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder /app/node_modules/tsx ./node_modules/tsx
+COPY --from=builder /app/node_modules/.bin ./node_modules/.bin
+
+# Create database directory with proper permissions
+RUN mkdir -p /app/prisma && chown -R nextjs:nodejs /app/prisma
+
+# Create an entrypoint script
+COPY --chown=nextjs:nodejs entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 USER nextjs
 
@@ -41,4 +51,4 @@ EXPOSE 3000
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
 
-CMD ["node", "server.js"]
+CMD ["/app/entrypoint.sh"]
