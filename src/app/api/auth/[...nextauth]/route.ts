@@ -9,12 +9,13 @@ import type { Session, User } from 'next-auth';
 declare module 'next-auth' {
   interface User {
     role: string;
+    username: string;
   }
   
   interface Session {
     user: {
       id: string;
-      email: string;
+      username: string;
       name: string;
       role: string;
     }
@@ -32,18 +33,18 @@ export const authOptions = {
     CredentialsProvider({
       name: 'credentials',
       credentials: {
-        email: { label: 'Email', type: 'email' },
+        username: { label: 'Username', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
+        if (!credentials?.username || !credentials?.password) {
           return null;
         }
 
         try {
           const user = await prisma.user.findUnique({
             where: {
-              email: credentials.email,
+              username: credentials.username,
               isActive: true,
             },
           });
@@ -63,7 +64,7 @@ export const authOptions = {
 
           return {
             id: user.id,
-            email: user.email,
+            username: user.username,
             name: user.name,
             role: user.role,
           };

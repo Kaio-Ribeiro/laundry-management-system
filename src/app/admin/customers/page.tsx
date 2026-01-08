@@ -18,7 +18,6 @@ interface Order {
 interface Customer {
   id: string;
   name: string;
-  email?: string;
   phone: string;
   address?: string;
   isActive: boolean;
@@ -38,7 +37,6 @@ export default function CustomersPage() {
   
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
     phone: '',
     address: '',
     isActive: true,
@@ -90,7 +88,6 @@ export default function CustomersPage() {
         setEditingCustomer(null);
         setFormData({
           name: '',
-          email: '',
           phone: '',
           address: '',
           isActive: true,
@@ -109,7 +106,6 @@ export default function CustomersPage() {
     setEditingCustomer(customer);
     setFormData({
       name: customer.name,
-      email: customer.email || '',
       phone: customer.phone,
       address: customer.address || '',
       isActive: customer.isActive,
@@ -162,7 +158,6 @@ export default function CustomersPage() {
     setEditingCustomer(null);
     setFormData({
       name: '',
-      email: '',
       phone: '',
       address: '',
       isActive: true,
@@ -314,16 +309,6 @@ export default function CustomersPage() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="email" className="text-gray-900 font-medium">E-mail (opcional)</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
                     <Label htmlFor="address" className="text-gray-900 font-medium">Endereço (opcional)</Label>
                     <textarea
                       id="address"
@@ -372,7 +357,6 @@ export default function CustomersPage() {
                   <tr className="border-b">
                     <th className="text-left py-2 text-gray-900 font-semibold">Nome</th>
                     <th className="text-left py-2 text-gray-900 font-semibold">Telefone</th>
-                    <th className="text-left py-2 text-gray-900 font-semibold">E-mail</th>
                     <th className="text-left py-2 text-gray-900 font-semibold">Status</th>
                     <th className="text-left py-2 text-gray-900 font-semibold">Ações</th>
                   </tr>
@@ -382,7 +366,6 @@ export default function CustomersPage() {
                     <tr key={customer.id} className="border-b hover:bg-gray-50">
                       <td className="py-3 text-gray-900 font-medium">{customer.name}</td>
                       <td className="py-3 text-gray-900">{formatPhone(customer.phone)}</td>
-                      <td className="py-3 text-gray-900">{customer.email || '-'}</td>
                       <td className="py-3">
                         <button
                           onClick={() => handleToggleStatus(customer.id, customer.isActive)}
@@ -415,14 +398,14 @@ export default function CustomersPage() {
                   ))}
                   {filteredCustomers.length === 0 && customers.length > 0 && (
                     <tr>
-                      <td colSpan={5} className="py-8 text-center text-gray-500">
+                      <td colSpan={4} className="py-8 text-center text-gray-500">
                         Nenhum cliente encontrado para &apos;{searchTerm}&apos;
                       </td>
                     </tr>
                   )}
                   {customers.length === 0 && (
                     <tr>
-                      <td colSpan={5} className="py-8 text-center text-gray-500">
+                      <td colSpan={4} className="py-8 text-center text-gray-500">
                         Nenhum cliente cadastrado
                       </td>
                     </tr>

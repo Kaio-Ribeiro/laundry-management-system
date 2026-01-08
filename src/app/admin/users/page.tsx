@@ -12,7 +12,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 interface User {
   id: string;
   name: string;
-  email: string;
+  username: string;
   role: string;
   isActive: boolean;
   createdAt: string;
@@ -31,7 +31,7 @@ export default function UsersPage() {
   
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
+    username: '',
     password: '',
     role: 'SELLER',
     isActive: true,
@@ -85,7 +85,7 @@ export default function UsersPage() {
         setEditingUser(null);
         setFormData({
           name: '',
-          email: '',
+          username: '',
           password: '',
           role: 'SELLER',
           isActive: true,
@@ -104,7 +104,7 @@ export default function UsersPage() {
     setEditingUser(user);
     setFormData({
       name: user.name,
-      email: user.email,
+      username: user.username,
       password: '',
       role: user.role,
       isActive: user.isActive,
@@ -158,7 +158,7 @@ export default function UsersPage() {
     setShowPassword(false);
     setFormData({
       name: '',
-      email: '',
+      username: '',
       password: '',
       role: 'SELLER',
       isActive: true,
@@ -288,12 +288,12 @@ export default function UsersPage() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="email" className="text-gray-900 font-medium">E-mail</Label>
+                    <Label htmlFor="username" className="text-gray-900 font-medium">Usuário</Label>
                     <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      id="username"
+                      type="text"
+                      value={formData.username}
+                      onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                       className="bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                       required
                     />
@@ -361,7 +361,7 @@ export default function UsersPage() {
                 <thead>
                   <tr className="border-b">
                     <th className="text-left py-2 text-gray-900 font-semibold">Nome</th>
-                    <th className="text-left py-2 text-gray-900 font-semibold">E-mail</th>
+                    <th className="text-left py-2 text-gray-900 font-semibold">Usuário</th>
                     <th className="text-left py-2 text-gray-900 font-semibold">Status</th>
                     <th className="text-left py-2 text-gray-900 font-semibold">Ações</th>
                   </tr>
@@ -370,7 +370,7 @@ export default function UsersPage() {
                   {filteredUsers.map((user) => (
                     <tr key={user.id} className="border-b hover:bg-gray-50">
                       <td className="py-3 text-gray-900">{user.name}</td>
-                      <td className="py-3 text-gray-900">{user.email}</td>
+                      <td className="py-3 text-gray-900">{user.username}</td>
                       <td className="py-3">
                         <button
                           onClick={() => handleToggleStatus(user.id, user.isActive)}

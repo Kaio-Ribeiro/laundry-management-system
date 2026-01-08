@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 
 interface UserUpdateData {
   name?: string;
-  email?: string;
+  username?: string;
   role?: string;
   isActive?: boolean;
   password?: string;
@@ -22,7 +22,7 @@ export async function GET(
       select: {
         id: true,
         name: true,
-        email: true,
+        username: true,
         role: true,
         isActive: true,
         createdAt: true,
@@ -55,12 +55,12 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { name, email, password, role, isActive } = body;
+    const { name, username, password, role, isActive } = body;
 
     // Preparar dados para atualização
     const updateData: UserUpdateData = {
       name,
-      email,
+      username,
       role,
       isActive,
     };
@@ -70,18 +70,18 @@ export async function PUT(
       updateData.password = await bcrypt.hash(password, 10);
     }
 
-    // Verificar se email já existe em outro usuário
-    if (email) {
+    // Verificar se username já existe em outro usuário
+    if (username) {
       const existingUser = await prisma.user.findFirst({
         where: {
-          email,
+          username,
           id: { not: id },
         },
       });
 
       if (existingUser) {
         return NextResponse.json(
-          { error: 'Email already exists' },
+          { error: 'Username already exists' },
           { status: 400 }
         );
       }
@@ -93,7 +93,7 @@ export async function PUT(
       select: {
         id: true,
         name: true,
-        email: true,
+        username: true,
         role: true,
         isActive: true,
         createdAt: true,

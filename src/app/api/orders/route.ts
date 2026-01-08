@@ -6,7 +6,7 @@ import { prisma } from '../../../lib/prisma';
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
+    if (!session?.user?.username) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
@@ -52,13 +52,13 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
+    if (!session?.user?.username) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
     // Buscar o usuário logado
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { username: session.user.username },
     });
 
     if (!user) {

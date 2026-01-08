@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Droplets } from 'lucide-react';
 
 export default function CreateAdminPage() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
@@ -30,7 +30,7 @@ export default function CreateAdminPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password, name }),
+        body: JSON.stringify({ username, password, name }),
       });
 
       const data = await response.json();
@@ -81,13 +81,13 @@ export default function CreateAdminPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-gray-700 font-medium">E-mail</Label>
+              <Label htmlFor="username" className="text-gray-700 font-medium">Usuário</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="admin@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="username"
+                type="text"
+                placeholder="Digite o usuário"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-11 placeholder:text-gray-400"
                 required
               />

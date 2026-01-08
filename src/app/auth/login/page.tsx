@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Droplets, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -25,7 +25,7 @@ export default function LoginPage() {
 
     try {
       const result = await signIn('credentials', {
-        email,
+        username,
         password,
         redirect: false,
       });
@@ -71,13 +71,13 @@ export default function LoginPage() {
         <CardContent className="pb-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-gray-700 font-medium">E-mail</Label>
+              <Label htmlFor="username" className="text-gray-700 font-medium">Usuário</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="admin@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="username"
+                type="text"
+                placeholder="Digite seu usuário"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-11 placeholder:text-gray-400"
                 required
               />

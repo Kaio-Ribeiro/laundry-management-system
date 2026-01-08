@@ -4,10 +4,10 @@ import { prisma } from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, name } = await request.json();
+    const { username, password, name } = await request.json();
 
     // Validação básica
-    if (!email || !password || !name) {
+    if (!username || !password || !name) {
       return NextResponse.json(
         { error: 'Todos os campos são obrigatórios' },
         { status: 400 }
@@ -16,12 +16,12 @@ export async function POST(request: NextRequest) {
 
     // Verificar se o usuário já existe
     const existingUser = await prisma.user.findUnique({
-      where: { email },
+      where: { username },
     });
 
     if (existingUser) {
       return NextResponse.json(
-        { error: 'Usuário já existe com este email' },
+        { error: 'Usuário já existe com este username' },
         { status: 400 }
       );
     }
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     // Criar usuário admin
     const user = await prisma.user.create({
       data: {
-        email,
+        username,
         password: hashedPassword,
         name,
         role: 'ADMIN',

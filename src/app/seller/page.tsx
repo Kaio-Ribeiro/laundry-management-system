@@ -35,7 +35,6 @@ export default function SellerPage() {
   
   const [customerForm, setCustomerForm] = useState({
     name: '',
-    email: '',
     phone: '',
     address: ''
   });
@@ -65,7 +64,7 @@ export default function SellerPage() {
       if (response.ok) {
         setSuccess('Cliente cadastrado com sucesso!');
         setShowCustomerModal(false);
-        setCustomerForm({ name: '', email: '', phone: '', address: '' });
+        setCustomerForm({ name: '', phone: '', address: '' });
       } else {
         const errorData = await response.json();
         setError(errorData.error || 'Erro ao cadastrar cliente');
@@ -144,7 +143,7 @@ export default function SellerPage() {
 
   const handleCancelCustomer = () => {
     setShowCustomerModal(false);
-    setCustomerForm({ name: '', email: '', phone: '', address: '' });
+    setCustomerForm({ name: '', phone: '', address: '' });
     clearMessages();
   };
 
@@ -313,16 +312,6 @@ export default function SellerPage() {
                     placeholder="(11) 99999-9999"
                     className="bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                     required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="email" className="text-gray-900 font-medium">E-mail (opcional)</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={customerForm.email}
-                    onChange={(e) => setCustomerForm({ ...customerForm, email: e.target.value })}
-                    className="bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                   />
                 </div>
                 <div>

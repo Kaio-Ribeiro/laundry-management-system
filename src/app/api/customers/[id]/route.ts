@@ -48,7 +48,7 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { name, email, phone, address, isActive } = body;
+    const { name, phone, address, isActive } = body;
 
     // Verificar se o cliente existe
     const existingCustomer = await prisma.customer.findUnique({
@@ -77,23 +77,6 @@ export async function PUT(
       );
     }
 
-    // Verificar se já existe outro cliente com o mesmo email
-    if (email && email !== existingCustomer.email) {
-      const duplicateCustomer = await prisma.customer.findFirst({
-        where: {
-          email: email,
-          NOT: { id }
-        }
-      });
-
-      if (duplicateCustomer) {
-        return NextResponse.json(
-          { error: 'Já existe um cliente com este e-mail' },
-          { status: 400 }
-        );
-      }
-    }
-
     // Verificar se já existe outro cliente com o mesmo telefone
     if (phone && phone !== existingCustomer.phone) {
       const duplicateCustomer = await prisma.customer.findFirst({
@@ -115,7 +98,6 @@ export async function PUT(
       where: { id },
       data: {
         ...(name && { name }),
-        ...(email !== undefined && { email: email || null }),
         ...(phone && { phone }),
         ...(address !== undefined && { address }),
         ...(isActive !== undefined && { isActive }),

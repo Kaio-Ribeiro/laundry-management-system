@@ -21,7 +21,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, phone, address } = body;
+    const { name, phone, address } = body;
 
     // Validações
     if (!name || !phone) {
@@ -29,22 +29,6 @@ export async function POST(request: NextRequest) {
         { error: 'Nome e telefone são obrigatórios' },
         { status: 400 }
       );
-    }
-
-    // Verificar se já existe um cliente com o mesmo email (se fornecido)
-    if (email) {
-      const existingCustomerByEmail = await prisma.customer.findFirst({
-        where: {
-          email: email
-        }
-      });
-
-      if (existingCustomerByEmail) {
-        return NextResponse.json(
-          { error: 'Já existe um cliente com este e-mail' },
-          { status: 400 }
-        );
-      }
     }
 
     // Verificar se já existe um cliente com o mesmo telefone
@@ -64,7 +48,6 @@ export async function POST(request: NextRequest) {
     const customer = await prisma.customer.create({
       data: {
         name,
-        email: email || null,
         phone,
         address: address || '',
         isActive: true

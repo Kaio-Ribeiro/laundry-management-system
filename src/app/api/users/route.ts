@@ -9,7 +9,7 @@ export async function GET() {
       select: {
         id: true,
         name: true,
-        email: true,
+        username: true,
         role: true,
         isActive: true,
         createdAt: true,
@@ -34,16 +34,16 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, password, role } = body;
+    const { name, username, password, role } = body;
 
-    // Verificar se o email já existe
+    // Verificar se o username já existe
     const existingUser = await prisma.user.findUnique({
-      where: { email },
+      where: { username },
     });
 
     if (existingUser) {
       return NextResponse.json(
-        { error: 'Email already exists' },
+        { error: 'Username already exists' },
         { status: 400 }
       );
     }
@@ -55,14 +55,14 @@ export async function POST(request: Request) {
     const user = await prisma.user.create({
       data: {
         name,
-        email,
+        username,
         password: hashedPassword,
         role: role || 'SELLER',
       },
       select: {
         id: true,
         name: true,
-        email: true,
+        username: true,
         role: true,
         isActive: true,
         createdAt: true,

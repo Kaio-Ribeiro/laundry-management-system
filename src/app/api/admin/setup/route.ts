@@ -6,21 +6,27 @@ import bcrypt from 'bcryptjs';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, password } = body;
+    const { name, username, password } = body;
 
     // Validações básicas
-    if (!name || !email || !password) {
+    if (!name || !username || !password) {
       return NextResponse.json(
-        { error: 'Nome, email e senha são obrigatórios' },
+        { error: 'Nome, username e senha são obrigatórios' },
         { status: 400 }
       );
     }
 
-    // Validar formato do email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    // Validar username (mínimo 3 caracteres, sem espaços)
+    if (username.length < 3) {
       return NextResponse.json(
-        { error: 'Formato de email inválido' },
+        { error: 'Username deve ter pelo menos 3 caracteres' },
+        { status: 400 }
+      );
+    }
+
+    if (/\s/.test(username)) {
+      return NextResponse.json(
+        { error: 'Username não pode conter espaços' },
         { status: 400 }
       );
     }
@@ -47,16 +53,16 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verificar se o email já existe
+    // Verificar se o username já existe
     const existingUser = await prisma.user.findUnique({
       where: {
-        email: email.toLowerCase(),
+        username: username.toLowerCase(),
       },
     });
 
     if (existingUser) {
       return NextResponse.json(
-        { error: 'Email já cadastrado' },
+        { error: 'Username já cadastrado' },
         { status: 409 }
       );
     }
@@ -69,7 +75,7 @@ export async function POST(request: Request) {
     const newAdmin = await prisma.user.create({
       data: {
         name,
-        email: email.toLowerCase(),
+        username: username.toLowerCase(),
         password: hashedPassword,
         role: 'ADMIN', // Forçar role como ADMIN
         isActive: true,
@@ -77,7 +83,7 @@ export async function POST(request: Request) {
       select: {
         id: true,
         name: true,
-        email: true,
+        username: true,
         role: true,
         isActive: true,
         createdAt: true,
@@ -119,6 +125,6 @@ export async function GET() {
   return NextResponse.json({
     message: 'Rota temporária para criação de admin ativa',
     warning: 'Esta rota será removida em produção',
-    instructions: 'POST com { "name": "Nome", "email": "email@domain.com", "password": "senha123" }'
+    instructions: 'POST com { "name": "Nome", "username": "admin", "password": "senha123" }'
   });
 }
