@@ -25,6 +25,7 @@ declare module 'next-auth' {
 declare module 'next-auth/jwt' {
   interface JWT {
     role: string;
+    username: string;
   }
 }
 
@@ -79,6 +80,7 @@ export const authOptions = {
     async jwt({ token, user }: { token: JWT; user: User | null }) {
       if (user) {
         token.role = user.role;
+        token.username = user.username;
       }
       return token;
     },
@@ -86,6 +88,7 @@ export const authOptions = {
       if (token && token.sub) {
         session.user.id = token.sub;
         session.user.role = token.role;
+        session.user.username = token.username as string;
       }
       return session;
     },

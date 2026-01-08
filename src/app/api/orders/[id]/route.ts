@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../../../../lib/auth-options';
+import { authOptions } from '../../auth/[...nextauth]/route';
 import { prisma } from '../../../../lib/prisma';
 
 export async function PUT(
@@ -13,9 +13,9 @@ export async function PUT(
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    const { id: orderId } = await params;
-    const body = await request.json();
-    const { customerId, serviceId, quantity, notes, status } = body;
+      const { id: orderId } = await params;
+      const body = await request.json();
+      const { customerId, orderItems, notes, status } = body;
 
     // Verificar se o pedido existe
     const existingOrder = await prisma.order.findUnique({
@@ -27,36 +27,46 @@ export async function PUT(
       return NextResponse.json({ error: 'Pedido não encontrado' }, { status: 404 });
     }
 
-    // Se está atualizando serviço ou quantidade, precisamos recalcular
+    // Se veio orderItems, substituímos os itens atuais pelo novo conjunto e recalculamos totalPrice
     let newTotalPrice = existingOrder.totalPrice;
-    
-    if (serviceId || quantity) {
-      // Buscar o serviço (pode ser o mesmo ou um novo)
-      const currentServiceId = serviceId || existingOrder.orderItems[0]?.serviceId;
-      const currentQuantity = quantity || existingOrder.orderItems[0]?.quantity;
-      
-      if (currentServiceId) {
-        const service = await prisma.service.findUnique({
-          where: { id: currentServiceId },
-        });
+    if (orderItems) {
+      if (!Array.isArray(orderItems) || orderItems.length === 0) {
+        return NextResponse.json({ error: 'orderItems inválido' }, { status: 400 });
+      }
 
-        if (!service || !service.isActive) {
-          return NextResponse.json({ error: 'Serviço não encontrado ou inativo' }, { status: 404 });
+      // Validar e calcular
+      const itemsToCreate: Array<{ serviceId: string; quantity: number; price: number; subtotal: number }> = [];
+      let acc = 0;
+      for (const it of orderItems) {
+        const { serviceId, quantity } = it as { serviceId?: string; quantity?: number };
+        if (!serviceId || !quantity || quantity < 1) {
+          return NextResponse.json({ error: 'Dados inválidos em orderItems' }, { status: 400 });
         }
 
-        newTotalPrice = service.price * currentQuantity;
+        const service = await prisma.service.findUnique({ where: { id: serviceId } });
+        if (!service || !service.isActive) {
+          return NextResponse.json({ error: `Serviço ${serviceId} não encontrado ou inativo` }, { status: 404 });
+        }
 
-        // Atualizar o item do pedido
-        await prisma.orderItem.updateMany({
-          where: { orderId },
-          data: {
-            serviceId: currentServiceId,
-            quantity: currentQuantity,
-            price: service.price,
-            subtotal: newTotalPrice,
-          },
-        });
+        const subtotal = service.price * quantity;
+        acc += subtotal;
+        itemsToCreate.push({ serviceId, quantity, price: service.price, subtotal });
       }
+
+      newTotalPrice = acc;
+
+      // Substituir itens antigos por novos
+      await prisma.orderItem.deleteMany({ where: { orderId } });
+      // createMany is faster but doesn't support nested writes with relations here; use createMany
+      await prisma.orderItem.createMany({
+        data: itemsToCreate.map(i => ({
+          orderId,
+          serviceId: i.serviceId,
+          quantity: i.quantity,
+          price: i.price,
+          subtotal: i.subtotal,
+        })),
+      });
     }
 
     // Atualizar o pedido

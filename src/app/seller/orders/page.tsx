@@ -40,6 +40,18 @@ interface Order {
   orderItems: OrderItem[];
 }
 
+interface FormOrderItem {
+  serviceId: string;
+  quantity: number;
+}
+
+interface OrderForm {
+  customerId: string;
+  orderItems: FormOrderItem[];
+  notes: string;
+  status: string;
+}
+
 export default function SellerOrdersPage() {
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -51,10 +63,9 @@ export default function SellerOrdersPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<OrderForm>({
     customerId: '',
-    serviceId: '',
-    quantity: 1,
+    orderItems: [{ serviceId: '', quantity: 1 }],
     notes: '',
     status: 'PENDING'
   });
@@ -76,7 +87,7 @@ export default function SellerOrdersPage() {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch('/api/orders');
+      const response = await fetch('/api/orders', { credentials: 'include' });
       if (response.ok) {
         const data = await response.json();
         setOrders(data);
@@ -92,7 +103,7 @@ export default function SellerOrdersPage() {
 
   const fetchCustomers = async () => {
     try {
-      const response = await fetch('/api/customers');
+      const response = await fetch('/api/customers', { credentials: 'include' });
       if (response.ok) {
         const data = await response.json();
         setCustomers(data);
@@ -104,7 +115,7 @@ export default function SellerOrdersPage() {
 
   const fetchServices = async () => {
     try {
-      const response = await fetch('/api/services');
+      const response = await fetch('/api/services', { credentials: 'include' });
       if (response.ok) {
         const data = await response.json();
         setServices(data.filter((service: Service & {isActive: boolean}) => service.isActive));
@@ -122,13 +133,24 @@ export default function SellerOrdersPage() {
     try {
       const method = editingOrder ? 'PUT' : 'POST';
       const url = editingOrder ? `/api/orders/${editingOrder.id}` : '/api/orders';
-      
+      // Build payload with orderItems array
+      const payload = {
+        customerId: formData.customerId,
+        orderItems: formData.orderItems.map((it: { serviceId: string; quantity: number }) => ({
+          serviceId: it.serviceId,
+          quantity: it.quantity
+        })),
+        notes: formData.notes,
+        status: formData.status
+      };
+
       const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        credentials: 'include',
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
@@ -137,8 +159,7 @@ export default function SellerOrdersPage() {
         setEditingOrder(null);
         setFormData({
           customerId: '',
-          serviceId: '',
-          quantity: 1,
+          orderItems: [{ serviceId: '', quantity: 1 }],
           notes: '',
           status: 'PENDING'
         });
@@ -156,8 +177,7 @@ export default function SellerOrdersPage() {
     setEditingOrder(order);
     setFormData({
       customerId: order.customer.id,
-      serviceId: order.orderItems[0]?.service.id || '',
-      quantity: order.orderItems[0]?.quantity || 1,
+      orderItems: order.orderItems.map(item => ({ serviceId: item.service.id, quantity: item.quantity })),
       notes: order.notes || '',
       status: order.status
     });
@@ -170,6 +190,7 @@ export default function SellerOrdersPage() {
     try {
       const response = await fetch(`/api/orders/${order.id}`, {
         method: 'DELETE',
+        credentials: 'include',
       });
 
       if (response.ok) {
@@ -184,13 +205,27 @@ export default function SellerOrdersPage() {
     }
   };
 
+  const handleAddService = () => {
+    setFormData((prev: OrderForm) => ({
+      ...prev,
+      orderItems: [...(prev.orderItems || []), { serviceId: '', quantity: 1 }]
+    }));
+  };
+
+  const handleRemoveService = (index: number) => {
+    setFormData((prev: OrderForm) => {
+      const items = [...(prev.orderItems || [])];
+      items.splice(index, 1);
+      return { ...prev, orderItems: items.length ? items : [{ serviceId: '', quantity: 1 }] };
+    });
+  };
+
   const handleCancel = () => {
     setShowForm(false);
     setEditingOrder(null);
     setFormData({
       customerId: '',
-      serviceId: '',
-      quantity: 1,
+      orderItems: [{ serviceId: '', quantity: 1 }],
       notes: '',
       status: 'PENDING'
     });
@@ -314,33 +349,62 @@ export default function SellerOrdersPage() {
                     </select>
                   </div>
                   <div>
-                    <Label htmlFor="serviceId" className="text-gray-900 font-medium">Serviço</Label>
-                    <select
-                      id="serviceId"
-                      value={formData.serviceId}
-                      onChange={(e) => setFormData({ ...formData, serviceId: e.target.value })}
-                      className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:border-green-500 focus:ring-green-500 bg-white text-gray-900"
-                      required
-                    >
-                      <option value="">Selecione um serviço</option>
-                      {services.map((service) => (
-                        <option key={service.id} value={service.id}>
-                          {service.name} - R$ {service.price.toFixed(2)}
-                        </option>
+                    <Label className="text-gray-900 font-medium">Serviços</Label>
+                    <div className="space-y-2">
+                      {formData.orderItems.map((item: FormOrderItem, idx: number) => (
+                        <div key={idx} className="flex gap-2 items-center">
+                          <select
+                            value={item.serviceId}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              setFormData((prev: OrderForm) => {
+                                const items = [...prev.orderItems];
+                                items[idx] = { ...items[idx], serviceId: value };
+                                return { ...prev, orderItems: items };
+                              });
+                            }}
+                            className="flex-1 h-10 px-3 py-2 border border-gray-300 rounded-md focus:border-green-500 focus:ring-green-500 bg-white text-gray-900"
+                            required
+                          >
+                            <option value="">Selecione um serviço</option>
+                            {services.map((service) => (
+                              <option key={service.id} value={service.id}>
+                                {service.name} - R$ {service.price.toFixed(2)}
+                              </option>
+                            ))}
+                          </select>
+                          <Input
+                            type="number"
+                            min={1}
+                            value={item.quantity}
+                            onChange={(e) => {
+                              const q = parseInt(e.target.value) || 1;
+                              setFormData((prev: OrderForm) => {
+                                const items = [...prev.orderItems];
+                                items[idx] = { ...items[idx], quantity: q };
+                                return { ...prev, orderItems: items };
+                              });
+                            }}
+                            className="w-24 bg-white text-gray-900 border-gray-300 focus:border-green-500 focus:ring-green-500"
+                            required
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveService(idx)}
+                            className="text-red-600 hover:text-red-800 p-2"
+                            title="Remover serviço"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       ))}
-                    </select>
-                  </div>
-                  <div>
-                    <Label htmlFor="quantity" className="text-gray-900 font-medium">Quantidade</Label>
-                    <Input
-                      id="quantity"
-                      type="number"
-                      min="1"
-                      value={formData.quantity}
-                      onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 1 })}
-                      className="bg-white text-gray-900 border-gray-300 focus:border-green-500 focus:ring-green-500"
-                      required
-                    />
+                      <div>
+                        <Button type="button" onClick={handleAddService} className="bg-green-500 hover:bg-green-600">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Adicionar Serviço
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                   {editingOrder && (
                     <div>
