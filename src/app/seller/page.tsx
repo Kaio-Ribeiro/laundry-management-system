@@ -211,26 +211,6 @@ export default function SellerPage() {
             <p className="mt-1 text-gray-600">Gerencie clientes e crie novos pedidos</p>
           </div>
           
-          {/* Quick Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8">
-            <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-              <div className="text-2xl font-bold text-blue-600">12</div>
-              <div className="text-sm text-gray-500">Pedidos Hoje</div>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-              <div className="text-2xl font-bold text-green-600">3</div>
-              <div className="text-sm text-gray-500">Pedidos Pendentes</div>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-              <div className="text-2xl font-bold text-purple-600">45</div>
-              <div className="text-sm text-gray-500">Meus Clientes</div>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-              <div className="text-2xl font-bold text-cyan-600">R$ 485</div>
-              <div className="text-sm text-gray-500">Vendas de Hoje</div>
-            </div>
-          </div>
-
           {/* Quick Actions */}
           <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-6 mb-8">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Ações Rápidas</h3>
@@ -249,6 +229,26 @@ export default function SellerPage() {
                 <ShoppingCart className="h-5 w-5 text-green-600" />
                 <span className="text-green-700 font-medium">Criar Pedido</span>
               </button>
+            </div>
+          </div>
+
+          {/* Quick Stats */}
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8">
+            <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+              <div className="text-2xl font-bold text-blue-600">12</div>
+              <div className="text-sm text-gray-500">Pedidos Hoje</div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+              <div className="text-2xl font-bold text-green-600">3</div>
+              <div className="text-sm text-gray-500">Pedidos Pendentes</div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+              <div className="text-2xl font-bold text-purple-600">45</div>
+              <div className="text-sm text-gray-500">Meus Clientes</div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+              <div className="text-2xl font-bold text-cyan-600">R$ 485</div>
+              <div className="text-sm text-gray-500">Vendas de Hoje</div>
             </div>
           </div>
 
