@@ -62,9 +62,10 @@ model Order {
   id         String      @id @default(cuid())
   customerId String
   sellerId   String
-  status     String      @default("PENDING") // "PENDING", "IN_PROGRESS", "COMPLETED", "DELIVERED"
+  status     String      @default("PENDING")
   totalPrice Float       @default(0)
   notes      String?
+  paymentMethod String?
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 

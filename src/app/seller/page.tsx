@@ -32,6 +32,7 @@ interface OrderForm {
   customerId: string;
   orderItems: FormOrderItem[];
   notes: string;
+  paymentMethod: string;
 }
 
 export default function SellerPage() {
@@ -54,6 +55,7 @@ export default function SellerPage() {
     customerId: '',
     orderItems: [{ serviceId: '', quantity: 1 }],
     notes: ''
+    ,paymentMethod: ''
   });
 
   const handleCustomerSubmit = async (e: React.FormEvent) => {
@@ -125,6 +127,7 @@ export default function SellerPage() {
           quantity: item.quantity
         })),
         notes: orderForm.notes
+        ,paymentMethod: orderForm.paymentMethod
       };
 
       const response = await fetch('/api/orders', {
@@ -141,7 +144,8 @@ export default function SellerPage() {
         setOrderForm({
           customerId: '',
           orderItems: [{ serviceId: '', quantity: 1 }],
-          notes: ''
+          notes: '',
+          paymentMethod: ''
         });
       } else {
         const errorData = await response.json();
@@ -182,7 +186,7 @@ export default function SellerPage() {
 
   const handleCancelOrder = () => {
     setShowOrderModal(false);
-    setOrderForm({ customerId: '', orderItems: [{ serviceId: '', quantity: 1 }], notes: '' });
+    setOrderForm({ customerId: '', orderItems: [{ serviceId: '', quantity: 1 }], notes: '', paymentMethod: '' });
     clearMessages();
   };
 
@@ -467,6 +471,22 @@ export default function SellerPage() {
                       </Button>
                     </div>
                   </div>
+                </div>
+                <div>
+                  <Label htmlFor="paymentMethod" className="text-gray-900 font-medium">Método de Pagamento</Label>
+                  <select
+                    id="paymentMethod"
+                    value={orderForm.paymentMethod}
+                    onChange={(e) => setOrderForm({ ...orderForm, paymentMethod: e.target.value })}
+                    className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-gray-900"
+                    required
+                  >
+                    <option value="">Selecione um método</option>
+                    <option value="CASH">Dinheiro</option>
+                    <option value="PIX">Pix</option>
+                    <option value="DEBIT">Cartão de débito</option>
+                    <option value="CREDIT">Cartão de crédito</option>
+                  </select>
                 </div>
                 <div>
                   <Label htmlFor="notes" className="text-gray-900 font-medium">Observações (opcional)</Label>

@@ -35,6 +35,7 @@ interface Order {
   status: string;
   totalPrice: number;
   notes?: string;
+  paymentMethod?: string;
   createdAt: string;
   customer: Customer;
   orderItems: OrderItem[];
@@ -50,6 +51,7 @@ interface OrderForm {
   orderItems: FormOrderItem[];
   notes: string;
   status: string;
+  paymentMethod: string;
 }
 
 export default function SellerOrdersPage() {
@@ -68,11 +70,11 @@ export default function SellerOrdersPage() {
     orderItems: [{ serviceId: '', quantity: 1 }],
     notes: '',
     status: 'PENDING'
+    ,paymentMethod: ''
   });
 
   const statusOptions = [
     { value: 'PENDING', label: 'Pendente', color: 'bg-yellow-100 text-yellow-700' },
-    { value: 'IN_PROGRESS', label: 'Em Andamento', color: 'bg-blue-100 text-blue-700' },
     { value: 'COMPLETED', label: 'Concluído', color: 'bg-green-100 text-green-700' },
     { value: 'DELIVERED', label: 'Entregue', color: 'bg-purple-100 text-purple-700' }
   ];
@@ -141,7 +143,8 @@ export default function SellerOrdersPage() {
           quantity: it.quantity
         })),
         notes: formData.notes,
-        status: formData.status
+        status: formData.status,
+        paymentMethod: formData.paymentMethod
       };
 
       const response = await fetch(url, {
@@ -161,7 +164,8 @@ export default function SellerOrdersPage() {
           customerId: '',
           orderItems: [{ serviceId: '', quantity: 1 }],
           notes: '',
-          status: 'PENDING'
+          status: 'PENDING',
+          paymentMethod: ''
         });
         await fetchOrders(); // Recarregar a lista
       } else {
@@ -179,7 +183,8 @@ export default function SellerOrdersPage() {
       customerId: order.customer.id,
       orderItems: order.orderItems.map(item => ({ serviceId: item.service.id, quantity: item.quantity })),
       notes: order.notes || '',
-      status: order.status
+      status: order.status,
+      paymentMethod: order.paymentMethod ?? ''
     });
     setShowForm(true);
   };
@@ -227,7 +232,8 @@ export default function SellerOrdersPage() {
       customerId: '',
       orderItems: [{ serviceId: '', quantity: 1 }],
       notes: '',
-      status: 'PENDING'
+      status: 'PENDING',
+      paymentMethod: ''
     });
     setError('');
     setSuccess('');
@@ -423,6 +429,22 @@ export default function SellerOrdersPage() {
                       </select>
                     </div>
                   )}
+                  <div>
+                    <Label htmlFor="paymentMethod" className="text-gray-900 font-medium">Método de Pagamento</Label>
+                    <select
+                      id="paymentMethod"
+                      value={formData.paymentMethod}
+                      onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
+                      className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:border-green-500 focus:ring-green-500 bg-white text-gray-900"
+                      required
+                    >
+                      <option value="">Selecione um método</option>
+                      <option value="CASH">Dinheiro</option>
+                      <option value="PIX">Pix</option>
+                      <option value="DEBIT">Cartão de débito</option>
+                      <option value="CREDIT">Cartão de crédito</option>
+                    </select>
+                  </div>
                   <div>
                     <Label htmlFor="notes" className="text-gray-900 font-medium">Observações (opcional)</Label>
                     <textarea

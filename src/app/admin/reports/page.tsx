@@ -68,9 +68,8 @@ export default function ReportsPage() {
   const statusOptions = [
     { value: 'all', label: 'Todos os status' },
     { value: 'PENDING', label: 'Pendente' },
-    { value: 'IN_PROGRESS', label: 'Em andamento' },
     { value: 'COMPLETED', label: 'Concluído' },
-    { value: 'CANCELLED', label: 'Cancelado' }
+    { value: 'DELIVERED', label: 'Entregue' }
   ];
 
   const handleSignOut = () => {
