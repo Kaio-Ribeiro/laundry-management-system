@@ -23,22 +23,18 @@ async function main() {
     data: [
       {
         name: 'Wash & Dry',
-        description: 'Complete washing and drying service',
         price: 5.00,
       },
       {
         name: 'Dry Cleaning',
-        description: 'Professional dry cleaning service',
         price: 15.00,
       },
       {
         name: 'Iron Only',
-        description: 'Ironing service for clean clothes',
         price: 3.00,
       },
       {
         name: 'Wash Only',
-        description: 'Washing service without drying',
         price: 3.50,
       },
     ],

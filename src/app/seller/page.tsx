@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Users, ShoppingCart, Droplets, Plus } from 'lucide-react';
+import { Users, ShoppingCart, Droplets, Plus, Trash2 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,17 @@ interface Service {
   price: number;
 }
 
+interface FormOrderItem {
+  serviceId: string;
+  quantity: number;
+}
+
+interface OrderForm {
+  customerId: string;
+  orderItems: FormOrderItem[];
+  notes: string;
+}
+
 export default function SellerPage() {
   const router = useRouter();
   const [showCustomerModal, setShowCustomerModal] = useState(false);
@@ -39,10 +50,9 @@ export default function SellerPage() {
     address: ''
   });
   
-  const [orderForm, setOrderForm] = useState({
+  const [orderForm, setOrderForm] = useState<OrderForm>({
     customerId: '',
-    serviceId: '',
-    quantity: 1,
+    orderItems: [{ serviceId: '', quantity: 1 }],
     notes: ''
   });
 
@@ -108,12 +118,21 @@ export default function SellerPage() {
     setSuccess('');
 
     try {
+      const payload = {
+        customerId: orderForm.customerId,
+        orderItems: orderForm.orderItems.map((item: FormOrderItem) => ({
+          serviceId: item.serviceId,
+          quantity: item.quantity
+        })),
+        notes: orderForm.notes
+      };
+
       const response = await fetch('/api/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(orderForm),
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
@@ -121,8 +140,7 @@ export default function SellerPage() {
         setShowOrderModal(false);
         setOrderForm({
           customerId: '',
-          serviceId: '',
-          quantity: 1,
+          orderItems: [{ serviceId: '', quantity: 1 }],
           notes: ''
         });
       } else {
@@ -147,9 +165,24 @@ export default function SellerPage() {
     clearMessages();
   };
 
+  const handleAddService = () => {
+    setOrderForm((prev: OrderForm) => ({
+      ...prev,
+      orderItems: [...prev.orderItems, { serviceId: '', quantity: 1 }]
+    }));
+  };
+
+  const handleRemoveService = (index: number) => {
+    setOrderForm((prev: OrderForm) => {
+      const items = [...prev.orderItems];
+      items.splice(index, 1);
+      return { ...prev, orderItems: items.length ? items : [{ serviceId: '', quantity: 1 }] };
+    });
+  };
+
   const handleCancelOrder = () => {
     setShowOrderModal(false);
-    setOrderForm({ customerId: '', serviceId: '', quantity: 1, notes: '' });
+    setOrderForm({ customerId: '', orderItems: [{ serviceId: '', quantity: 1 }], notes: '' });
     clearMessages();
   };
 
@@ -378,33 +411,62 @@ export default function SellerPage() {
                   </select>
                 </div>
                 <div>
-                  <Label htmlFor="serviceId" className="text-gray-900 font-medium">Serviço</Label>
-                  <select
-                    id="serviceId"
-                    value={orderForm.serviceId}
-                    onChange={(e) => setOrderForm({ ...orderForm, serviceId: e.target.value })}
-                    className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-gray-900"
-                    required
-                  >
-                    <option value="">Selecione um serviço</option>
-                    {services.map((service) => (
-                      <option key={service.id} value={service.id}>
-                        {service.name} - R$ {service.price.toFixed(2)}
-                      </option>
+                  <Label className="text-gray-900 font-medium">Serviços</Label>
+                  <div className="space-y-2">
+                    {orderForm.orderItems.map((item: FormOrderItem, idx: number) => (
+                      <div key={idx} className="flex gap-2 items-center">
+                        <select
+                          value={item.serviceId}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setOrderForm((prev: OrderForm) => {
+                              const items = [...prev.orderItems];
+                              items[idx] = { ...items[idx], serviceId: value };
+                              return { ...prev, orderItems: items };
+                            });
+                          }}
+                          className="flex-1 h-10 px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-gray-900"
+                          required
+                        >
+                          <option value="">Selecione um serviço</option>
+                          {services.map((service) => (
+                            <option key={service.id} value={service.id}>
+                              {service.name} - R$ {service.price.toFixed(2)}
+                            </option>
+                          ))}
+                        </select>
+                        <Input
+                          type="number"
+                          min={1}
+                          value={item.quantity}
+                          onChange={(e) => {
+                            const q = parseInt(e.target.value) || 1;
+                            setOrderForm((prev: OrderForm) => {
+                              const items = [...prev.orderItems];
+                              items[idx] = { ...items[idx], quantity: q };
+                              return { ...prev, orderItems: items };
+                            });
+                          }}
+                          className="w-24 bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveService(idx)}
+                          className="text-red-600 hover:text-red-800 p-2"
+                          title="Remover serviço"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     ))}
-                  </select>
-                </div>
-                <div>
-                  <Label htmlFor="quantity" className="text-gray-900 font-medium">Quantidade</Label>
-                  <Input
-                    id="quantity"
-                    type="number"
-                    min="1"
-                    value={orderForm.quantity}
-                    onChange={(e) => setOrderForm({ ...orderForm, quantity: parseInt(e.target.value) || 1 })}
-                    className="bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    required
-                  />
+                    <div>
+                      <Button type="button" onClick={handleAddService} className="bg-green-500 hover:bg-green-600">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Adicionar Serviço
+                      </Button>
+                    </div>
+                  </div>
                 </div>
                 <div>
                   <Label htmlFor="notes" className="text-gray-900 font-medium">Observações (opcional)</Label>

@@ -12,7 +12,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 interface Service {
   id: string;
   name: string;
-  description: string;
   price: number;
   commission: number;
   isActive: boolean;
@@ -31,7 +30,6 @@ export default function ServicesPage() {
   
   const [formData, setFormData] = useState({
     name: '',
-    description: '',
     price: '',
     commission: '',
     isActive: true,
@@ -96,7 +94,6 @@ export default function ServicesPage() {
         setEditingService(null);
         setFormData({
           name: '',
-          description: '',
           price: '',
           commission: '',
           isActive: true,
@@ -115,7 +112,6 @@ export default function ServicesPage() {
     setEditingService(service);
     setFormData({
       name: service.name,
-      description: service.description,
       price: service.price.toString(),
       commission: service.commission.toString(),
       isActive: service.isActive,
@@ -170,7 +166,6 @@ export default function ServicesPage() {
     setEditingService(null);
     setFormData({
       name: '',
-      description: '',
       price: '',
       commission: '',
       isActive: true,
@@ -332,17 +327,6 @@ export default function ServicesPage() {
                       onChange={(e) => setFormData({ ...formData, commission: e.target.value })}
                       placeholder="0.00"
                       className="bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="description" className="text-gray-900 font-medium">Descrição (opcional)</Label>
-                    <textarea
-                      id="description"
-                      value={formData.description}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      placeholder="Descrição detalhada do serviço..."
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-gray-900"
                     />
                   </div>
                   <div className="flex gap-2 pt-4 border-t">

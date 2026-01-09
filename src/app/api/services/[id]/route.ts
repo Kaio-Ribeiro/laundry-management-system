@@ -36,7 +36,7 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { name, description, price, commission, isActive } = body;
+    const { name, price, commission, isActive } = body;
 
     // Verificar se o serviço existe
     const existingService = await prisma.service.findUnique({
@@ -93,7 +93,6 @@ export async function PUT(
       where: { id },
       data: {
         ...(name && { name }),
-        ...(description !== undefined && { description }),
         ...(price !== undefined && { price: parseFloat(price) }),
         ...(commission !== undefined && { commission: parseFloat(commission) }),
         ...(isActive !== undefined && { isActive }),

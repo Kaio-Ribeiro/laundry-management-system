@@ -20,7 +20,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, description, price, commission } = body;
+    const { name, price, commission } = body;
 
     // Validações
     if (!name || !price) {
@@ -61,7 +61,6 @@ export async function POST(request: NextRequest) {
     const service = await prisma.service.create({
       data: {
         name,
-        description: description || '',
         price: parseFloat(price),
         commission: commission ? parseFloat(commission) : 0,
         isActive: true
