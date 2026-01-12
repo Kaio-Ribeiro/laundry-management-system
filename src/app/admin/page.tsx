@@ -1,6 +1,6 @@
 'use client';
 
-import { Users, Package, BarChart3, Droplets, Users2 } from 'lucide-react';
+import { Users, Package, BarChart3, Droplets, Users2, Repeat } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import ManagementCard from '@/components/ManagementCard';
@@ -26,6 +26,9 @@ export default function AdminPage() {
 
   const navigateToReports = () => {
     router.push('/admin/reports');
+  };
+  const navigateToTransferences = () => {
+    router.push('/admin/transferences');
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50">
@@ -123,6 +126,16 @@ export default function AdminPage() {
               actionText="Ver Relatórios"
               actionColor="text-purple-600"
               onClick={navigateToReports}
+            />
+
+            <ManagementCard
+              icon={Repeat}
+              iconColor="bg-yellow-500"
+              title="Transferências"
+              subtitle="Transferências"
+              actionText="Gerenciar Transferências"
+              actionColor="text-yellow-600"
+              onClick={navigateToTransferences}
             />
           </div>
         </div>

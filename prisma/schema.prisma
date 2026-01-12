@@ -92,3 +92,14 @@ model OrderItem {
 
   @@map("order_items")
 }
+
+model Transfer {
+  id        String   @id @default(cuid())
+  from      String   // "PIX" or "DINHEIRO"
+  to        String   // "PIX" or "DINHEIRO"
+  amount    Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("transfers")
+}
