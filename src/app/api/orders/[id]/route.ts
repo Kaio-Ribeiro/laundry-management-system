@@ -15,7 +15,7 @@ export async function PUT(
 
       const { id: orderId } = await params;
       const body = await request.json();
-      const { customerId, orderItems, notes, status } = body;
+      const { customerId, orderItems, notes, status, paymentMethod, discount } = body;
 
     // Verificar se o pedido existe
     const existingOrder = await prisma.order.findUnique({
@@ -69,6 +69,10 @@ export async function PUT(
       });
     }
 
+    // Apply discount if provided and compute final total
+    const discountNumber = Number(discount) || 0;
+    const finalTotalPrice = Math.max(0, newTotalPrice - discountNumber);
+
     // Atualizar o pedido
     const updatedOrder = await prisma.order.update({
       where: { id: orderId },
@@ -76,7 +80,9 @@ export async function PUT(
         ...(customerId && { customerId }),
         ...(status && { status }),
         ...(notes !== undefined && { notes }),
-        totalPrice: newTotalPrice,
+        totalPrice: finalTotalPrice,
+        paymentMethod: paymentMethod ?? undefined,
+        discount: discountNumber,
       },
       include: {
         customer: {

@@ -36,6 +36,7 @@ interface Order {
   totalPrice: number;
   notes?: string;
   paymentMethod?: string;
+  discount?: number;
   createdAt: string;
   customer: Customer;
   orderItems: OrderItem[];
@@ -52,6 +53,7 @@ interface OrderForm {
   notes: string;
   status: string;
   paymentMethod: string;
+  discount: string | number;
 }
 
 export default function SellerOrdersPage() {
@@ -70,7 +72,8 @@ export default function SellerOrdersPage() {
     orderItems: [{ serviceId: '', quantity: 1 }],
     notes: '',
     status: 'PENDING'
-    ,paymentMethod: ''
+    ,paymentMethod: '',
+    discount: ''
   });
 
   const statusOptions = [
@@ -136,6 +139,15 @@ export default function SellerOrdersPage() {
       const method = editingOrder ? 'PUT' : 'POST';
       const url = editingOrder ? `/api/orders/${editingOrder.id}` : '/api/orders';
       // Build payload with orderItems array
+      // calculate total before sending
+      const totalBefore = formData.orderItems.reduce((acc, it) => {
+        const svc = services.find(s => s.id === it.serviceId);
+        const price = svc ? svc.price : 0;
+        return acc + price * it.quantity;
+      }, 0);
+      const discount = Number(formData.discount) || 0;
+      const totalPrice = Math.max(0, totalBefore - discount);
+
       const payload = {
         customerId: formData.customerId,
         orderItems: formData.orderItems.map((it: { serviceId: string; quantity: number }) => ({
@@ -144,7 +156,9 @@ export default function SellerOrdersPage() {
         })),
         notes: formData.notes,
         status: formData.status,
-        paymentMethod: formData.paymentMethod
+        paymentMethod: formData.paymentMethod,
+        discount,
+        totalPrice
       };
 
       const response = await fetch(url, {
@@ -165,7 +179,8 @@ export default function SellerOrdersPage() {
           orderItems: [{ serviceId: '', quantity: 1 }],
           notes: '',
           status: 'PENDING',
-          paymentMethod: ''
+          paymentMethod: '',
+          discount: ''
         });
         await fetchOrders(); // Recarregar a lista
       } else {
@@ -177,14 +192,19 @@ export default function SellerOrdersPage() {
     }
   };
 
-  const handleEdit = (order: Order) => {
+  const handleEdit = async (order: Order) => {
+    // Ensure customers and services are loaded so selects can show the current values
+    await fetchCustomers();
+    await fetchServices();
+
     setEditingOrder(order);
     setFormData({
       customerId: order.customer.id,
       orderItems: order.orderItems.map(item => ({ serviceId: item.service.id, quantity: item.quantity })),
       notes: order.notes || '',
       status: order.status,
-      paymentMethod: order.paymentMethod ?? ''
+      paymentMethod: (order.paymentMethod ?? '').toString().trim().toUpperCase(),
+      discount: order.discount ? order.discount : ''
     });
     setShowForm(true);
   };
@@ -233,7 +253,8 @@ export default function SellerOrdersPage() {
       orderItems: [{ serviceId: '', quantity: 1 }],
       notes: '',
       status: 'PENDING',
-      paymentMethod: ''
+      paymentMethod: '',
+      discount: ''
     });
     setError('');
     setSuccess('');
@@ -436,7 +457,6 @@ export default function SellerOrdersPage() {
                       value={formData.paymentMethod}
                       onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
                       className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:border-green-500 focus:ring-green-500 bg-white text-gray-900"
-                      required
                     >
                       <option value="">Selecione um método</option>
                       <option value="CASH">Dinheiro</option>
@@ -445,6 +465,19 @@ export default function SellerOrdersPage() {
                       <option value="CREDIT">Cartão de crédito</option>
                     </select>
                   </div>
+                    <div>
+                      <Label htmlFor="discount" className="text-gray-900 font-medium">Desconto (R$)</Label>
+                      <Input
+                        id="discount"
+                        type="number"
+                        min={0}
+                        step="0.01"
+                        value={formData.discount === 0 || formData.discount === '' ? '' : formData.discount}
+                        onChange={(e) => setFormData({ ...formData, discount: e.target.value === '' ? '' : Number(e.target.value) })}
+                        placeholder="0,00"
+                        className="w-full bg-white text-gray-900 border-gray-300 focus:border-green-500 focus:ring-green-500"
+                      />
+                    </div>
                   <div>
                     <Label htmlFor="notes" className="text-gray-900 font-medium">Observações (opcional)</Label>
                     <textarea

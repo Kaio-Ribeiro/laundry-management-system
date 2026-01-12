@@ -33,6 +33,7 @@ interface OrderForm {
   orderItems: FormOrderItem[];
   notes: string;
   paymentMethod: string;
+  discount: string | number;
 }
 
 export default function SellerPage() {
@@ -56,6 +57,7 @@ export default function SellerPage() {
     orderItems: [{ serviceId: '', quantity: 1 }],
     notes: ''
     ,paymentMethod: ''
+    ,discount: ''
   });
 
   const handleCustomerSubmit = async (e: React.FormEvent) => {
@@ -120,14 +122,24 @@ export default function SellerPage() {
     setSuccess('');
 
     try {
+      const totalBefore = orderForm.orderItems.reduce((acc, it) => {
+        const svc = services.find(s => s.id === it.serviceId);
+        const price = svc ? svc.price : 0;
+        return acc + price * it.quantity;
+      }, 0);
+      const discount = Number(orderForm.discount) || 0;
+      const totalPrice = Math.max(0, totalBefore - discount);
+
       const payload = {
         customerId: orderForm.customerId,
         orderItems: orderForm.orderItems.map((item: FormOrderItem) => ({
           serviceId: item.serviceId,
           quantity: item.quantity
         })),
-        notes: orderForm.notes
-        ,paymentMethod: orderForm.paymentMethod
+        notes: orderForm.notes,
+        paymentMethod: orderForm.paymentMethod,
+        discount,
+        totalPrice
       };
 
       const response = await fetch('/api/orders', {
@@ -145,7 +157,8 @@ export default function SellerPage() {
           customerId: '',
           orderItems: [{ serviceId: '', quantity: 1 }],
           notes: '',
-          paymentMethod: ''
+          paymentMethod: '',
+          discount: ''
         });
       } else {
         const errorData = await response.json();
@@ -186,7 +199,7 @@ export default function SellerPage() {
 
   const handleCancelOrder = () => {
     setShowOrderModal(false);
-    setOrderForm({ customerId: '', orderItems: [{ serviceId: '', quantity: 1 }], notes: '', paymentMethod: '' });
+    setOrderForm({ customerId: '', orderItems: [{ serviceId: '', quantity: 1 }], notes: '', paymentMethod: '', discount: '' });
     clearMessages();
   };
 
@@ -479,7 +492,6 @@ export default function SellerPage() {
                     value={orderForm.paymentMethod}
                     onChange={(e) => setOrderForm({ ...orderForm, paymentMethod: e.target.value })}
                     className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-gray-900"
-                    required
                   >
                     <option value="">Selecione um método</option>
                     <option value="CASH">Dinheiro</option>
@@ -487,6 +499,19 @@ export default function SellerPage() {
                     <option value="DEBIT">Cartão de débito</option>
                     <option value="CREDIT">Cartão de crédito</option>
                   </select>
+                </div>
+                <div>
+                  <Label htmlFor="discount" className="text-gray-900 font-medium">Desconto (R$)</Label>
+                  <Input
+                    id="discount"
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    value={orderForm.discount === 0 || orderForm.discount === '' ? '' : orderForm.discount}
+                    onChange={(e) => setOrderForm({ ...orderForm, discount: e.target.value === '' ? '' : Number(e.target.value) })}
+                    placeholder="0,00"
+                    className="w-full bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  />
                 </div>
                 <div>
                   <Label htmlFor="notes" className="text-gray-900 font-medium">Observações (opcional)</Label>

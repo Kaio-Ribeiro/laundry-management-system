@@ -66,7 +66,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { customerId, orderItems, notes, status = 'PENDING' } = body;
+    const { customerId, orderItems, notes, status = 'PENDING', paymentMethod, discount } = body;
 
     // Validar dados obrigatórios
     if (!customerId || !orderItems || !Array.isArray(orderItems) || orderItems.length === 0) {
@@ -102,14 +102,20 @@ export async function POST(request: Request) {
       itemsToCreate.push({ serviceId, quantity, price: service.price, subtotal });
     }
 
+    // Apply discount if provided and compute final total
+    const discountNumber = Number(discount) || 0;
+    const finalTotalPrice = Math.max(0, totalPrice - discountNumber);
+
     // Criar o pedido com múltiplos orderItems
     const order = await prisma.order.create({
       data: {
         customerId,
         sellerId: user.id,
         status,
-        totalPrice,
+        totalPrice: finalTotalPrice,
         notes,
+        paymentMethod: paymentMethod ?? null,
+        discount: discountNumber,
         orderItems: {
           create: itemsToCreate.map(i => ({
             serviceId: i.serviceId,
