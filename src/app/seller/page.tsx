@@ -125,7 +125,8 @@ export default function SellerPage() {
       const totalBefore = orderForm.orderItems.reduce((acc, it) => {
         const svc = services.find(s => s.id === it.serviceId);
         const price = svc ? svc.price : 0;
-        return acc + price * it.quantity;
+        const quantity = Math.max(1, it.quantity || 1);
+        return acc + price * quantity;
       }, 0);
       const discount = Number(orderForm.discount) || 0;
       const totalPrice = Math.max(0, totalBefore - discount);
@@ -134,7 +135,7 @@ export default function SellerPage() {
         customerId: orderForm.customerId,
         orderItems: orderForm.orderItems.map((item: FormOrderItem) => ({
           serviceId: item.serviceId,
-          quantity: item.quantity
+          quantity: Math.max(1, item.quantity || 1)
         })),
         notes: orderForm.notes,
         paymentMethod: orderForm.paymentMethod,
@@ -455,14 +456,26 @@ export default function SellerPage() {
                         <Input
                           type="number"
                           min={1}
-                          value={item.quantity}
+                          value={item.quantity === 0 ? '' : item.quantity}
                           onChange={(e) => {
-                            const q = parseInt(e.target.value) || 1;
+                            const value = e.target.value;
+                            const q = value === '' ? 0 : (parseInt(value) || 0);
                             setOrderForm((prev: OrderForm) => {
                               const items = [...prev.orderItems];
                               items[idx] = { ...items[idx], quantity: q };
                               return { ...prev, orderItems: items };
                             });
+                          }}
+                          onBlur={(e) => {
+                            const value = e.target.value;
+                            const q = value === '' ? 1 : (parseInt(value) || 1);
+                            if (q < 1) {
+                              setOrderForm((prev: OrderForm) => {
+                                const items = [...prev.orderItems];
+                                items[idx] = { ...items[idx], quantity: 1 };
+                                return { ...prev, orderItems: items };
+                              });
+                            }
                           }}
                           className="w-24 bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                           required
