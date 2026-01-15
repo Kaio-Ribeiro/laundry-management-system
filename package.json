@@ -12,10 +12,10 @@
     "db:studio": "prisma studio",
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset --force && npm run db:seed",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "docker:logs": "docker-compose logs -f",
-    "prod": "docker-compose down && docker-compose build --no-cache laundry-app && docker-compose up -d && echo 'Deploy concluído! Verificando logs:' && docker-compose logs -f laundry-app"
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f",
+    "prod": "docker compose down && docker compose build --no-cache laundry-app && docker compose up -d && echo 'Deploy concluído! Verificando logs:' && docker compose logs -f laundry-app"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
