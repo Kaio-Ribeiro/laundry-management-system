@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState, useEffect } from 'react';
 import { Users, ShoppingCart, Droplets, Plus, Trash2 } from 'lucide-react';
@@ -36,6 +36,13 @@ interface OrderForm {
   discount: string | number;
 }
 
+interface SellerStats {
+  ordersToday: number;
+  pendingOrders: number;
+  totalCustomers: number;
+  salesToday: number;
+}
+
 export default function SellerPage() {
   const router = useRouter();
   const [showCustomerModal, setShowCustomerModal] = useState(false);
@@ -45,6 +52,8 @@ export default function SellerPage() {
   const [success, setSuccess] = useState('');
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [services, setServices] = useState<Service[]>([]);
+  const [sellerStats, setSellerStats] = useState<SellerStats | null>(null);
+  const [loadingStats, setLoadingStats] = useState(true);
   
   const [customerForm, setCustomerForm] = useState({
     name: '',
@@ -211,6 +220,21 @@ export default function SellerPage() {
   useEffect(() => {
     fetchCustomers();
     fetchServices();
+    let mounted = true;
+    const fetchStats = async () => {
+      try {
+        const res = await fetch('/api/seller/stats');
+        if (!res.ok) return;
+        const data: SellerStats = await res.json();
+        if (mounted) setSellerStats(data);
+      } catch (e) {
+        console.error('Erro ao carregar indicadores do vendedor', e);
+      } finally {
+        if (mounted) setLoadingStats(false);
+      }
+    };
+    fetchStats();
+    return () => { mounted = false; };
   }, []);
 
   return (
@@ -286,19 +310,19 @@ export default function SellerPage() {
           {/* Quick Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8">
             <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-              <div className="text-2xl font-bold text-blue-600">12</div>
+              <div className="text-2xl font-bold text-blue-600">{loadingStats ? '—' : sellerStats?.ordersToday ?? 0}</div>
               <div className="text-sm text-gray-500">Pedidos Hoje</div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-              <div className="text-2xl font-bold text-green-600">3</div>
+              <div className="text-2xl font-bold text-green-600">{loadingStats ? '—' : sellerStats?.pendingOrders ?? 0}</div>
               <div className="text-sm text-gray-500">Pedidos Pendentes</div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-              <div className="text-2xl font-bold text-purple-600">45</div>
+              <div className="text-2xl font-bold text-purple-600">{loadingStats ? '—' : sellerStats?.totalCustomers ?? 0}</div>
               <div className="text-sm text-gray-500">Meus Clientes</div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-              <div className="text-2xl font-bold text-cyan-600">R$ 485</div>
+              <div className="text-2xl font-bold text-cyan-600">{loadingStats ? '—' : new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(sellerStats?.salesToday ?? 0)}</div>
               <div className="text-sm text-gray-500">Vendas de Hoje</div>
             </div>
           </div>

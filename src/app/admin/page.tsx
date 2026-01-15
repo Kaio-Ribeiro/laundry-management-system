@@ -1,12 +1,22 @@
-'use client';
+"use client";
 
+import React, { useEffect, useState } from 'react';
 import { Users, Package, BarChart3, Droplets, Users2, Repeat } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import ManagementCard from '@/components/ManagementCard';
 
+type Stats = {
+  activeOrders: number;
+  revenueToday: number;
+  newCustomers: number;
+  totalCustomers: number;
+};
+
 export default function AdminPage() {
   const router = useRouter();
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [loadingStats, setLoadingStats] = useState(true);
   
   const handleSignOut = () => {
     signOut({ callbackUrl: '/' });
@@ -30,6 +40,28 @@ export default function AdminPage() {
   const navigateToTransferences = () => {
     router.push('/admin/transferences');
   };
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchStats = async () => {
+      try {
+        const res = await fetch('/api/admin/stats');
+        if (!res.ok) throw new Error('failed');
+        const data: Stats = await res.json();
+        if (mounted) setStats(data);
+      } catch (e) {
+        console.error('Error fetching stats', e);
+      } finally {
+        if (mounted) setLoadingStats(false);
+      }
+    };
+    fetchStats();
+    return () => { mounted = false; };
+  }, []);
+
+  const formatCurrency = (value: number) =>
+    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50">
       {/* Header */}
@@ -70,19 +102,23 @@ export default function AdminPage() {
           {/* Quick Stats */}
           <div className="mb-8 grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-              <div className="text-2xl font-bold text-blue-600">24</div>
+              <div className="text-2xl font-bold text-blue-600">
+                {loadingStats ? '—' : stats?.activeOrders ?? 0}
+              </div>
               <div className="text-sm text-gray-500">Pedidos Ativos</div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-              <div className="text-2xl font-bold text-green-600">R$ 1.245</div>
+              <div className="text-2xl font-bold text-green-600">
+                {loadingStats ? '—' : formatCurrency(stats?.revenueToday ?? 0)}
+              </div>
               <div className="text-sm text-gray-500">Receita de Hoje</div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-              <div className="text-2xl font-bold text-purple-600">8</div>
+              <div className="text-2xl font-bold text-purple-600">{loadingStats ? '—' : stats?.newCustomers ?? 0}</div>
               <div className="text-sm text-gray-500">Novos Clientes</div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-              <div className="text-2xl font-bold text-cyan-600">156</div>
+              <div className="text-2xl font-bold text-cyan-600">{loadingStats ? '—' : stats?.totalCustomers ?? 0}</div>
               <div className="text-sm text-gray-500">Total de Clientes</div>
             </div>
           </div>
