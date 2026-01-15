@@ -10,11 +10,22 @@ RUN npm ci --only=production
 FROM node:20-alpine AS builder
 WORKDIR /app
 RUN apk add --no-cache libc6-compat openssl
+
+# Set memory limits and optimization flags
+ENV NODE_OPTIONS="--max-old-space-size=2048 --max-semi-space-size=64"
+ENV NEXT_TELEMETRY_DISABLED=1
+
 COPY package*.json ./
 RUN npm ci
+
+# Copy source files
 COPY . .
+
+# Generate Prisma client
 RUN npx prisma generate
-RUN NODE_OPTIONS="--max-old-space-size=1024" npm run build
+
+# Build with additional optimizations
+RUN npm run build
 
 # Stage 3: Runner
 FROM node:20-alpine AS runner
